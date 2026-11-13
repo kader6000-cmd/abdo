@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>ABDO IPTV — إضافة سيرفر</title>
+<style>
+:root{--bg:#0b0d14;--card:#151926;--line:#2a3042;--ink:#f2f4fa;--mut:#9aa3b8;--red:#ff1e3c}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 0 100%,#4a0b18 0,transparent 55%),var(--bg);color:var(--ink);font:18px/1.6 system-ui,"Segoe UI",Tahoma,Arial,sans-serif;padding:20px 16px 40px}
+main{max-width:520px;margin:0 auto}
+h1{font-size:26px;margin:6px 0 4px}h1 span{color:var(--red)}
+p.sub{margin:0 0 18px;color:var(--mut)}
+form{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px}
+label{display:block;margin:12px 0 6px;font-weight:700}
+input,select{width:100%;padding:14px;font-size:18px;border-radius:12px;border:1px solid var(--line);background:#0d1019;color:var(--ink)}
+input:focus,select:focus{outline:2px solid var(--red)}
+.ltr{direction:ltr;text-align:left}
+.row{display:flex;gap:8px}.row input{flex:1}
+.eye{width:64px;border-radius:12px;border:1px solid var(--line);background:#0d1019;color:var(--ink);font-size:18px}
+button.go{width:100%;margin-top:20px;padding:16px;font-size:20px;font-weight:800;color:#fff;border:0;border-radius:14px;background:linear-gradient(135deg,#ff3b57,#b3102b)}
+button.go:disabled{opacity:.5}
+#msg{margin-top:14px;padding:12px 14px;border-radius:12px;display:none;font-weight:700}
+#msg.ok{display:block;background:#0f3a24;color:#9dffc0}#msg.err{display:block;background:#4a1620;color:#ffb3bf}
+small{color:var(--mut)}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<main>
+ <h1>ABDO <span>IPTV</span></h1>
+ <p class="sub">أضف سيرفر جديد وسيصل إلى التلفزيون مباشرة.</p>
+ <form id="f" autocomplete="off">
+  <label for="n">اسم السيرفر</label>
+  <input id="n" placeholder="مثال: السيرفر الأول" required>
+  <label for="t">نوع الاتصال</label>
+  <select id="t"><option value="xtream">Xtream Codes</option><option value="m3u">رابط M3U</option></select>
+  <div id="xt">
+   <label for="h">عنوان السيرفر</label>
+   <input id="h" class="ltr" inputmode="url" autocapitalize="off" placeholder="http://example.com:8080">
+   <label for="u">اسم المستخدم</label>
+   <input id="u" class="ltr" autocapitalize="off" autocorrect="off">
+   <label for="p">كلمة المرور</label>
+   <div class="row"><input id="p" class="ltr" type="password" autocapitalize="off" autocorrect="off"><button type="button" class="eye" id="eye">👁</button></div>
+  </div>
+  <div id="m3" class="hidden">
+   <label for="m">رابط M3U</label>
+   <input id="m" class="ltr" inputmode="url" autocapitalize="off" placeholder="http://example.com/get.php?username=..&password=..">
+  </div>
+  <button class="go" id="go" type="submit">إرسال إلى التلفزيون</button>
+  <div id="msg"></div>
+ </form>
+ <p><small id="note"></small></p>
+</main>
+<script>
+(function(){
+"use strict";
+var q=new URLSearchParams(location.search),topic=(q.get("t")||"").replace(/[^a-z0-9]/gi,""),relay=(q.get("r")||"https://ntfy.sh").replace(/\/+$/,"");
+var hp=new URLSearchParams((location.hash||"").replace(/^#/,"")),key=hp.get("k")||"";
+var $=function(i){return document.getElementById(i)};
+function msg(t,c){var m=$("msg");m.textContent=t;m.className=c}
+function b64u(a){var s="";for(var i=0;i<a.length;i++)s+=String.fromCharCode(a[i]);return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
+function unb64u(t){t=t.replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";var s=atob(t),a=new Uint8Array(s.length);for(var i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return a}
+function encrypt(text){
+ var raw=unb64u(key),iv=crypto.getRandomValues(new Uint8Array(12));
+ return crypto.subtle.importKey("raw",raw,{name:"AES-GCM"},false,["encrypt"]).then(function(k){
+  return crypto.subtle.encrypt({name:"AES-GCM",iv:iv},k,new TextEncoder().encode(text))}).then(function(ct){
+  var out=new Uint8Array(12+ct.byteLength);out.set(iv,0);out.set(new Uint8Array(ct),12);return b64u(out)});
+}
+$("t").onchange=function(){var x=this.value==="xtream";$("xt").classList.toggle("hidden",!x);$("m3").classList.toggle("hidden",x)};
+$("eye").onclick=function(){var p=$("p");p.type=p.type==="password"?"text":"password"};
+$("note").textContent=!topic?"":(key?"🔒 البيانات تُرسل مشفّرة ولا يقرأها إلا التلفزيون.":"⚠️ البيانات تُرسل بدون تشفير عبر خدمة الربط.");
+if(!topic){msg("افتح هذه الصفحة بمسح رمز QR من شاشة التلفزيون.","err");$("go").disabled=true}
+$("f").onsubmit=function(e){
+ e.preventDefault();
+ var type=$("t").value,o={v:1,n:$("n").value.trim(),t:type};
+ if(type==="m3u"){o.m=$("m").value.trim();if(!/^https?:\/\//i.test(o.m))return msg("أدخل رابط M3U صحيحًا يبدأ بـ http","err")}
+ else{o.h=$("h").value.trim().replace(/\/+$/,"");o.u=$("u").value.trim();o.p=$("p").value;
+  if(!/^https?:\/\//i.test(o.h))return msg("عنوان السيرفر يجب أن يبدأ بـ http:// أو https://","err");
+  if(!o.u||!o.p)return msg("أكمل اسم المستخدم وكلمة المرور","err")}
+ if(!o.n)return msg("اكتب اسم السيرفر","err");
+ $("go").disabled=true;msg("جارٍ الإرسال…","ok");
+ var text=JSON.stringify(o),p=key?encrypt(text):Promise.resolve(text);
+ p.then(function(body){return fetch(relay+"/"+topic,{method:"POST",body:body})}).then(function(r){
+  if(!r.ok)throw Error("HTTP "+r.status);msg("✅ تم الإرسال — راجع شاشة التلفزيون","ok");$("f").reset();$("t").onchange();
+ }).catch(function(err){msg("تعذر الإرسال: "+err.message,"err")}).then(function(){$("go").disabled=false});
+};
+})();
+</script>
+</body>
+</html>
