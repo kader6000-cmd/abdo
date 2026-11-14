@@ -3,89 +3,270 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="robots" content="noindex">
-<title>ABDO IPTV — إضافة سيرفر</title>
+<meta name="theme-color" content="#0b0d14">
+<title>ABDO IPTV — إدارة السيرفرات</title>
 <style>
-:root{--bg:#0b0d14;--card:#151926;--line:#2a3042;--ink:#f2f4fa;--mut:#9aa3b8;--red:#ff1e3c}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 0 100%,#4a0b18 0,transparent 55%),var(--bg);color:var(--ink);font:18px/1.6 system-ui,"Segoe UI",Tahoma,Arial,sans-serif;padding:20px 16px 40px}
-main{max-width:520px;margin:0 auto}
-h1{font-size:26px;margin:6px 0 4px}h1 span{color:var(--red)}
-p.sub{margin:0 0 18px;color:var(--mut)}
-form{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px}
-label{display:block;margin:12px 0 6px;font-weight:700}
-input,select{width:100%;padding:14px;font-size:18px;border-radius:12px;border:1px solid var(--line);background:#0d1019;color:var(--ink)}
-input:focus,select:focus{outline:2px solid var(--red)}
-.ltr{direction:ltr;text-align:left}
-.row{display:flex;gap:8px}.row input{flex:1}
-.eye{width:64px;border-radius:12px;border:1px solid var(--line);background:#0d1019;color:var(--ink);font-size:18px}
-button.go{width:100%;margin-top:20px;padding:16px;font-size:20px;font-weight:800;color:#fff;border:0;border-radius:14px;background:linear-gradient(135deg,#ff3b57,#b3102b)}
-button.go:disabled{opacity:.5}
-#msg{margin-top:14px;padding:12px 14px;border-radius:12px;display:none;font-weight:700}
-#msg.ok{display:block;background:#0f3a24;color:#9dffc0}#msg.err{display:block;background:#4a1620;color:#ffb3bf}
-small{color:var(--mut)}
-.hidden{display:none}
+body{margin:0;background:#0b0d14;color:#f3f5fb;font-family:system-ui,Tahoma,Arial,sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:720px;margin:0 auto;padding:16px 14px 80px}
+h1{font-size:22px;margin:6px 0 2px}
+h2{font-size:17px;margin:0 0 10px}
+.card{background:#141826;border:1px solid #2a3150;border-radius:14px;padding:14px;margin:14px 0}
+.dev{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.mac{direction:ltr;font-family:ui-monospace,Menlo,monospace;color:#ffd88a;font-size:15px}
+label{display:block;margin:10px 0 4px;color:#c9cedb;font-size:14px}
+input,select,textarea{width:100%;background:#0b1020;color:#fff;border:1px solid #38426a;border-radius:10px;padding:12px;font-size:16px;font-family:inherit}
+textarea{min-height:120px;direction:ltr;text-align:left;font-family:ui-monospace,Menlo,monospace;font-size:14px}
+input.ltr{direction:ltr;text-align:left}
+button{border:0;border-radius:10px;padding:12px 16px;font-size:16px;font-weight:700;background:#e11d3f;color:#fff;cursor:pointer}
+button.sec{background:#2c3556}
+button.sm{padding:7px 11px;font-size:14px}
+button:disabled{opacity:.5}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.row>*{flex:1 1 auto}
+.tabs{display:flex;gap:8px;margin-bottom:6px}
+.tabs button{flex:1;background:#1d2440}
+.tabs button.on{background:#e11d3f}
+.srv{display:flex;gap:8px;align-items:center;background:#0f1424;border:1px solid #2a3150;border-radius:12px;padding:10px;margin:8px 0}
+.srv .n{width:30px;height:30px;border-radius:8px;background:#2a1220;display:grid;place-items:center;flex:none;font-weight:700;color:#ff8da1}
+.srv .m{flex:1;min-width:0}
+.srv .m b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.srv .m small{display:block;color:#9eabc4;direction:ltr;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag{font-size:12px;padding:2px 8px;border-radius:99px;background:#18351f;color:#9dffc0;margin-inline-start:6px}
+.tag.new{background:#3a2c12;color:#ffd88a}
+.ctl{display:flex;flex-direction:column;gap:4px}
+.msg{margin:10px 0 0;padding:10px 12px;border-radius:10px;background:#1d2440;min-height:20px}
+.msg.ok{background:#0f3a24;color:#9dffc0}.msg.err{background:#4a1620;color:#ffb3bf}
+.hint{color:#9eabc4;font-size:13px}
+.hidden{display:none!important}
 </style>
 </head>
 <body>
-<main>
- <h1>ABDO <span>IPTV</span></h1>
- <p class="sub">أضف سيرفر جديد وسيصل إلى التلفزيون مباشرة.</p>
- <form id="f" autocomplete="off">
-  <label for="n">اسم السيرفر</label>
-  <input id="n" placeholder="مثال: السيرفر الأول" required>
-  <label for="t">نوع الاتصال</label>
-  <select id="t"><option value="xtream">Xtream Codes</option><option value="m3u">رابط M3U</option></select>
-  <div id="xt">
-   <label for="h">عنوان السيرفر</label>
-   <input id="h" class="ltr" inputmode="url" autocapitalize="off" placeholder="http://example.com:8080">
-   <label for="u">اسم المستخدم</label>
-   <input id="u" class="ltr" autocapitalize="off" autocorrect="off">
-   <label for="p">كلمة المرور</label>
-   <div class="row"><input id="p" class="ltr" type="password" autocapitalize="off" autocorrect="off"><button type="button" class="eye" id="eye">👁</button></div>
+<div class="wrap">
+  <h1>ABDO IPTV</h1>
+  <div class="hint">صفحة ثابتة لإدارة سيرفرات تلفزيونك — احفظها في المفضلة أو أضفها للشاشة الرئيسية.</div>
+
+  <div id="noDev" class="card hidden">
+    <h2>لا يوجد جهاز مرتبط</h2>
+    <div>افتح التطبيق على التلفزيون، ثم الإعدادات ← «إضافة من الموبايل (QR)»، وامسح الرمز بكاميرا الموبايل.</div>
   </div>
-  <div id="m3" class="hidden">
-   <label for="m">رابط M3U</label>
-   <input id="m" class="ltr" inputmode="url" autocapitalize="off" placeholder="http://example.com/get.php?username=..&password=..">
+
+  <div id="main" class="hidden">
+    <div class="card dev">
+      <div>
+        <div class="hint">التلفزيون المرتبط</div>
+        <div class="mac" id="devMac"></div>
+      </div>
+      <select id="devSel" style="max-width:220px" class="hidden"></select>
+      <button class="sec sm" id="devDel">فصل الجهاز</button>
+    </div>
+
+    <div class="card">
+      <h2>إضافة سيرفر</h2>
+      <div class="tabs">
+        <button id="tabOne" class="on" type="button">سيرفر واحد</button>
+        <button id="tabBulk" type="button">عدة سيرفرات</button>
+      </div>
+
+      <div id="paneOne">
+        <label>اسم السيرفر</label><input id="fName" placeholder="مثال: السيرفر الأول">
+        <label>نوع الاتصال</label>
+        <select id="fType"><option value="xtream">Xtream Codes</option><option value="m3u">رابط M3U</option></select>
+        <div id="fX">
+          <label>عنوان السيرفر</label><input id="fHost" class="ltr" placeholder="http://example.com:8080" inputmode="url" autocapitalize="off" autocomplete="off">
+          <label>اسم المستخدم</label><input id="fUser" class="ltr" autocapitalize="off" autocomplete="off">
+          <label>كلمة المرور</label><input id="fPass" class="ltr" autocapitalize="off" autocomplete="off">
+        </div>
+        <div id="fM" class="hidden">
+          <label>رابط M3U</label><input id="fUrl" class="ltr" placeholder="http://.../get.php?username=..&password=.." inputmode="url" autocapitalize="off" autocomplete="off">
+        </div>
+        <div class="row"><button id="btnAdd" type="button">＋ أضف للقائمة</button></div>
+      </div>
+
+      <div id="paneBulk" class="hidden">
+        <label>ألصق السيرفرات — كل سطر سيرفر</label>
+        <textarea id="bulk" placeholder="الاسم|http://host:port|المستخدم|كلمة المرور&#10;الاسم|http://.../get.php?username=..&password=..&#10;http://.../get.php?username=..&password=.."></textarea>
+        <div class="hint">الصيغ المقبولة: <b>الاسم|العنوان|المستخدم|الكلمة</b> أو <b>الاسم|رابط M3U</b> أو رابط M3U فقط.</div>
+        <div class="row"><button id="btnBulk" type="button">＋ أضف الكل للقائمة</button></div>
+      </div>
+      <div id="addMsg" class="msg hidden"></div>
+    </div>
+
+    <div class="card">
+      <h2>قائمة السيرفرات <span class="hint" id="cnt"></span></h2>
+      <div id="list"></div>
+      <div class="row">
+        <button id="btnSendNew" type="button">إرسال الجديد إلى التلفزيون</button>
+        <button id="btnSendAll" class="sec" type="button">إعادة إرسال الكل</button>
+      </div>
+      <div id="sendMsg" class="msg hidden"></div>
+      <div class="hint" style="margin-top:8px">ملاحظة: الترتيب النهائي والتعديل يتمّان من التلفزيون نفسه. السيرفر المرسل مسبقًا يتحدّث ولا يتكرر.</div>
+    </div>
   </div>
-  <button class="go" id="go" type="submit">إرسال إلى التلفزيون</button>
-  <div id="msg"></div>
- </form>
- <p><small id="note"></small></p>
-</main>
+</div>
+
 <script>
 (function(){
 "use strict";
-var q=new URLSearchParams(location.search),topic=(q.get("t")||"").replace(/[^a-z0-9]/gi,""),relay=(q.get("r")||"https://ntfy.sh").replace(/\/+$/,"");
-var hp=new URLSearchParams((location.hash||"").replace(/^#/,"")),key=hp.get("k")||"";
 var $=function(i){return document.getElementById(i)};
-function msg(t,c){var m=$("msg");m.textContent=t;m.className=c}
-function b64u(a){var s="";for(var i=0;i<a.length;i++)s+=String.fromCharCode(a[i]);return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
+var DEV_KEY="abdo_devices_v1",ACT_KEY="abdo_active_dev_v1";
+var devices={},active="",MAX_CHUNK=2400;
+
+function load(){try{devices=JSON.parse(localStorage.getItem(DEV_KEY)||"{}")||{}}catch(e){devices={}}active=localStorage.getItem(ACT_KEY)||""}
+function persist(){try{localStorage.setItem(DEV_KEY,JSON.stringify(devices));localStorage.setItem(ACT_KEY,active)}catch(e){}}
+function normMac(m){m=String(m||"").replace(/-/g,":");return m}
+
+/* ---- استقبال الربط من الـ QR ---- */
+(function readQR(){
+  var q=new URLSearchParams(location.search),t=q.get("t"),h=location.hash||"",k="";
+  var mm=/[#&]k=([A-Za-z0-9_-]+)/.exec(h);if(mm)k=mm[1];
+  if(!t)return;
+  load();
+  var old=devices[t]||{servers:[]};
+  devices[t]={topic:t,key:k||old.key||"",relay:q.get("r")||old.relay||"https://ntfy.sh",mac:normMac(q.get("m"))||old.mac||t.slice(0,8),servers:old.servers||[]};
+  active=t;persist();
+  /* احتفظ بالرابط الكامل (مع المفتاح) ليبقى صالحًا عند الإضافة للشاشة الرئيسية */
+})();
+load();
+if(!active||!devices[active]){var ks=Object.keys(devices);active=ks[0]||""}
+
+function dev(){return devices[active]||null}
+function show(el,on){$(el).classList.toggle("hidden",!on)}
+function msg(id,t,kind){var e=$(id);e.textContent=t;e.className="msg "+(kind||"");e.classList.toggle("hidden",!t)}
+
+/* ---- تشفير AES-GCM (نفس بروتوكول التلفزيون) ---- */
+function b64u(bytes){var s="";for(var i=0;i<bytes.length;i++)s+=String.fromCharCode(bytes[i]);return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
 function unb64u(t){t=t.replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";var s=atob(t),a=new Uint8Array(s.length);for(var i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return a}
-function encrypt(text){
- var raw=unb64u(key),iv=crypto.getRandomValues(new Uint8Array(12));
- return crypto.subtle.importKey("raw",raw,{name:"AES-GCM"},false,["encrypt"]).then(function(k){
-  return crypto.subtle.encrypt({name:"AES-GCM",iv:iv},k,new TextEncoder().encode(text))}).then(function(ct){
-  var out=new Uint8Array(12+ct.byteLength);out.set(iv,0);out.set(new Uint8Array(ct),12);return b64u(out)});
+function encrypt(text,keyB64){
+  var iv=crypto.getRandomValues(new Uint8Array(12));
+  return crypto.subtle.importKey("raw",unb64u(keyB64),{name:"AES-GCM"},false,["encrypt"]).then(function(k){
+    return crypto.subtle.encrypt({name:"AES-GCM",iv:iv},k,new TextEncoder().encode(text));
+  }).then(function(ct){var c=new Uint8Array(ct),o=new Uint8Array(12+c.length);o.set(iv,0);o.set(c,12);return b64u(o)});
 }
-$("t").onchange=function(){var x=this.value==="xtream";$("xt").classList.toggle("hidden",!x);$("m3").classList.toggle("hidden",x)};
-$("eye").onclick=function(){var p=$("p");p.type=p.type==="password"?"text":"password"};
-$("note").textContent=!topic?"":(key?"🔒 البيانات تُرسل مشفّرة ولا يقرأها إلا التلفزيون.":"⚠️ البيانات تُرسل بدون تشفير عبر خدمة الربط.");
-if(!topic){msg("افتح هذه الصفحة بمسح رمز QR من شاشة التلفزيون.","err");$("go").disabled=true}
-$("f").onsubmit=function(e){
- e.preventDefault();
- var type=$("t").value,o={v:1,n:$("n").value.trim(),t:type};
- if(type==="m3u"){o.m=$("m").value.trim();if(!/^https?:\/\//i.test(o.m))return msg("أدخل رابط M3U صحيحًا يبدأ بـ http","err")}
- else{o.h=$("h").value.trim().replace(/\/+$/,"");o.u=$("u").value.trim();o.p=$("p").value;
-  if(!/^https?:\/\//i.test(o.h))return msg("عنوان السيرفر يجب أن يبدأ بـ http:// أو https://","err");
-  if(!o.u||!o.p)return msg("أكمل اسم المستخدم وكلمة المرور","err")}
- if(!o.n)return msg("اكتب اسم السيرفر","err");
- $("go").disabled=true;msg("جارٍ الإرسال…","ok");
- var text=JSON.stringify(o),p=key?encrypt(text):Promise.resolve(text);
- p.then(function(body){return fetch(relay+"/"+topic,{method:"POST",body:body})}).then(function(r){
-  if(!r.ok)throw Error("HTTP "+r.status);msg("✅ تم الإرسال — راجع شاشة التلفزيون","ok");$("f").reset();$("t").onchange();
- }).catch(function(err){msg("تعذر الإرسال: "+err.message,"err")}).then(function(){$("go").disabled=false});
+function post(d,body){
+  return fetch(d.relay.replace(/\/+$/,"")+"/"+d.topic,{method:"POST",body:body}).then(function(r){if(!r.ok)throw Error("HTTP "+r.status)});
+}
+
+/* ---- عرض ---- */
+function render(){
+  var d=dev();
+  show("noDev",!d);show("main",!!d);
+  if(!d)return;
+  $("devMac").textContent=d.mac;
+  var ks=Object.keys(devices);
+  show("devSel",ks.length>1);
+  $("devSel").innerHTML="";
+  ks.forEach(function(k){var o=document.createElement("option");o.value=k;o.textContent=devices[k].mac;if(k===active)o.selected=true;$("devSel").appendChild(o)});
+  var L=$("list");L.innerHTML="";
+  var news=0;
+  d.servers.forEach(function(s,i){
+    if(!s.sent)news++;
+    var r=document.createElement("div");r.className="srv";
+    r.innerHTML='<span class="n"></span><div class="m"><b></b><small></small></div><div class="ctl"><button class="sec sm up" type="button">▲</button><button class="sec sm dn" type="button">▼</button></div><button class="sec sm del" type="button">✕</button>';
+    r.querySelector(".n").textContent=i+1;
+    var b=r.querySelector("b");b.textContent=s.n;
+    var tg=document.createElement("span");tg.className="tag"+(s.sent?"":" new");tg.textContent=s.sent?"أُرسل":"جديد";b.appendChild(tg);
+    r.querySelector("small").textContent=s.t==="m3u"?s.m:s.h+" · "+s.u;
+    r.querySelector(".up").onclick=function(){mv(i,-1)};
+    r.querySelector(".dn").onclick=function(){mv(i,1)};
+    r.querySelector(".del").onclick=function(){d.servers.splice(i,1);persist();render()};
+    L.appendChild(r);
+  });
+  $("cnt").textContent="("+d.servers.length+")";
+  $("btnSendNew").disabled=!news;$("btnSendAll").disabled=!d.servers.length;
+  $("btnSendNew").textContent=news?"إرسال الجديد ("+news+") إلى التلفزيون":"لا يوجد جديد للإرسال";
+}
+function mv(i,dl){var a=dev().servers,j=i+dl;if(j<0||j>=a.length)return;var t=a[i];a[i]=a[j];a[j]=t;persist();render()}
+
+/* ---- قراءة الإدخال ---- */
+function fromLine(line){
+  line=line.trim();if(!line)return null;
+  var p=line.split("|").map(function(x){return x.trim()});
+  if(p.length>=4)return {n:p[0]||"سيرفر",t:"xtream",h:p[1].replace(/\/+$/,""),u:p[2],p:p.slice(3).join("|")};
+  if(p.length===2)return {n:p[0]||"سيرفر",t:"m3u",m:p[1]};
+  if(/^https?:\/\//i.test(line))return {n:"سيرفر",t:"m3u",m:line};
+  return null;
+}
+function valid(s){
+  if(!s)return false;
+  if(s.t==="m3u")return /^https?:\/\//i.test(s.m);
+  return /^https?:\/\//i.test(s.h)&&!!s.u&&!!s.p;
+}
+function add(list){
+  var d=dev(),ok=0,bad=0;
+  list.forEach(function(s){
+    if(!valid(s)){bad++;return}
+    var dup=d.servers.findIndex(function(x){return x.t===s.t&&(s.t==="m3u"?x.m===s.m:(x.h===s.h&&x.u===s.u))});
+    s.sent=false;
+    if(dup>=0)d.servers[dup]=s;else d.servers.push(s);
+    ok++;
+  });
+  persist();render();
+  msg("addMsg",ok?("تمت إضافة "+ok+" سيرفر للقائمة"+(bad?" — تجاهلت "+bad+" سطر غير صالح":"")+". اضغط «إرسال» لنقلها للتلفزيون."):"لم تتم إضافة أي سيرفر — تحقق من البيانات",ok?"ok":"err");
+  return ok;
+}
+
+/* ---- إرسال (دفعات ≤ حد حجم الرسالة) ---- */
+function toPayload(s){return s.t==="m3u"?{n:s.n,t:"m3u",m:s.m}:{n:s.n,t:"xtream",h:s.h,u:s.u,p:s.p}}
+function chunks(items){
+  var out=[],cur=[];
+  items.forEach(function(s){
+    var next=cur.concat([s]);
+    if(cur.length&&JSON.stringify(next.map(toPayload)).length>MAX_CHUNK){out.push(cur);cur=[s]}else cur=next;
+  });
+  if(cur.length)out.push(cur);
+  return out;
+}
+function send(all){
+  var d=dev();if(!d)return;
+  var items=d.servers.filter(function(s){return all||!s.sent});
+  if(!items.length){msg("sendMsg","لا يوجد ما يُرسل","err");return}
+  $("btnSendNew").disabled=$("btnSendAll").disabled=true;
+  msg("sendMsg","جارٍ الإرسال…","");
+  var parts=chunks(items),sent=0;
+  var useKey=!!d.key&&window.crypto&&crypto.subtle;
+  (function next(i){
+    if(i>=parts.length){
+      persist();render();
+      msg("sendMsg","تم إرسال "+sent+" سيرفر إلى التلفزيون ✓ (تأكد أن التطبيق مفتوح أو افتحه لاحقًا — تُحفظ الرسائل 12 ساعة)","ok");return;
+    }
+    var text=JSON.stringify(parts[i].map(toPayload));
+    var p=useKey?encrypt(text,d.key):Promise.resolve(text);
+    p.then(function(body){return post(d,body)}).then(function(){
+      parts[i].forEach(function(s){s.sent=true});sent+=parts[i].length;persist();
+      setTimeout(function(){next(i+1)},parts.length>1?700:0);
+    }).catch(function(e){
+      persist();render();
+      msg("sendMsg","فشل الإرسال ("+(e&&e.message||e)+"). تُرسل "+sent+" سيرفر قبل الخطأ — أعد المحاولة.","err");
+    });
+  })(0);
+}
+
+/* ---- أحداث ---- */
+function tab(one){$("tabOne").classList.toggle("on",one);$("tabBulk").classList.toggle("on",!one);show("paneOne",one);show("paneBulk",!one)}
+$("tabOne").onclick=function(){tab(true)};
+$("tabBulk").onclick=function(){tab(false)};
+$("fType").onchange=function(){var m=$("fType").value==="m3u";show("fM",m);show("fX",!m)};
+$("btnAdd").onclick=function(){
+  var t=$("fType").value,s={n:$("fName").value.trim()||"سيرفر",t:t};
+  if(t==="m3u")s.m=$("fUrl").value.trim();
+  else{s.h=$("fHost").value.trim().replace(/\/+$/,"");s.u=$("fUser").value.trim();s.p=$("fPass").value}
+  if(add([s])){$("fName").value=$("fHost").value=$("fUser").value=$("fPass").value=$("fUrl").value=""}
 };
+$("btnBulk").onclick=function(){
+  var list=$("bulk").value.split(/\r?\n/).map(fromLine).filter(function(x){return x});
+  var raw=$("bulk").value.split(/\r?\n/).filter(function(l){return l.trim()}).length;
+  var ok=add(list);
+  if(ok&&ok===raw)$("bulk").value="";
+};
+$("btnSendNew").onclick=function(){send(false)};
+$("btnSendAll").onclick=function(){send(true)};
+$("devSel").onchange=function(){active=$("devSel").value;persist();render()};
+$("devDel").onclick=function(){
+  if(!confirm("فصل هذا الجهاز وحذف قائمته من هذا الموبايل؟ (لن يتأثر التلفزيون)"))return;
+  delete devices[active];active=Object.keys(devices)[0]||"";persist();render();
+};
+render();
 })();
 </script>
 </body>
