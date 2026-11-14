@@ -56,6 +56,7 @@ button:disabled{opacity:.5}
       <div>
         <div class="hint">التلفزيون المرتبط</div>
         <div class="mac" id="devMac"></div>
+        <div class="hint" id="devInfo"></div>
       </div>
       <select id="devSel" style="max-width:220px" class="hidden"></select>
       <button class="sec sm" id="devDel">فصل الجهاز</button>
@@ -153,6 +154,7 @@ function render(){
   show("noDev",!d);show("main",!!d);
   if(!d)return;
   $("devMac").textContent=d.mac;
+  $("devInfo").textContent="رمز الربط: "+d.topic.slice(-4)+(d.key?" — مشفّر ✓":" — ⚠️ لا يوجد مفتاح: امسح الـ QR من التلفزيون من جديد");
   var ks=Object.keys(devices);
   show("devSel",ks.length>1);
   $("devSel").innerHTML="";
